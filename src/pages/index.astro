@@ -3,38 +3,45 @@ import { Image } from "astro:assets";
 import BaseLayout from "~/layouts/BaseLayout.astro";
 import "@fancyapps/ui/dist/fancybox/fancybox.css";
 
-const images = import.meta.glob<{ default: ImageMetadata }>(
-  "../images/*.{jpg,jpeg,png,webp}",
+const allImages = await Astro.glob<{ default: ImageMetadata }>(
+  "../images/**/*.{jpg,jpeg,png,webp}",
 );
+
+const sortedImages = allImages.sort((a, b) => {
+  if (b.url > a.url) return -1;
+  if (b.url < a.url) return 1;
+  return 0;
+});
+
 ---
 
 <BaseLayout
-  title="Astro Photo Grid"
-  description="A minimal, single-page photo gallery for Astro."
+  title="Astro Photo Grid"
+  description="A minimal, single-page photo gallery for Astro."
 >
-  <section class="justified-gallery" id="photoswipe">
-    {
-      Object.entries(images).map(async ([_path, image], index) => {
-        const { default: imageData } = await image();
-        return (
-          <a
-            style={`--width: ${imageData.width}; --height: ${imageData.height};`}
-            href={imageData.src}
-            target="_blank"
-            data-fancybox="gallery"
-          >
-            <Image
-              format="webp"
-              src={imageData}
-              alt=""
-              height={400}
-              loading={index < 20 ? "eager" : "lazy"}
-            />
-          </a>
-        );
-      })
-    }
-  </section>
+  <section class="justified-gallery" id="photoswipe">
+    {
+      sortedImages.map(async (image, index) => {
+        const { default: imageData } = image;
+        return (
+          <a
+            style={`--width: ${imageData.width}; --height: ${imageData.height};`}
+            href={imageData.src}
+            target="_blank"
+            data-fancybox="gallery"
+          >
+            <Image
+              format="webp"
+              src={imageData}
+              alt=""
+              height={400}
+              loading={index < 20 ? "eager" : "lazy"}
+            />
+          </a>
+        );
+      })
+    }
+  </section>
 </BaseLayout>
 
 <script>

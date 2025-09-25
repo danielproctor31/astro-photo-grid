@@ -3,7 +3,8 @@ import { Image } from "astro:assets";
 import BaseLayout from "~/layouts/BaseLayout.astro";
 import "@fancyapps/ui/dist/fancybox/fancybox.css";
 
-const allImages = await Astro.glob<{ default: ImageMetadata }>(
+type ImageModule = { url: string; file: string; default: ImageMetadata };
+const allImages = await Astro.glob<ImageModule>(
   "../images/**/*.{jpg,jpeg,png,webp}",
 );
 
